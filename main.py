@@ -36,12 +36,34 @@ class Auctioneer:
         #  70 % companies and 30 % stocks by default
         #  but the company and stock provided must be normalised based on number of rounds and init cash
         def generate_normal_company():
-            base_value = (1/10) * self.rounds  #  this was the base value we use to start the game in the college
+            MULTIPLIER = [0.7, 0.5, *[1]*2 , 2, 1.5]  #  this will reduce random structure, and also create normalisation, what this does - it makes the company x times the base value
+            base_value = (1/10) * self.rounds  #  this was the base value we use to start the game in the college, refined through years and came up with this
+            normalised_company = random.Random().choice(MULTIPLIER) * base_value
+            return round(normalised_company, 3)
+
+        def generate_normal_stock():
+            MULTIPLIER = [*[1]*2, 1.3, 1.5]  # same logic
+            base_value = (1 / 3) * self.rounds  # based on auctioneer experience, as we used to give 5 bil stock as of 15 rounds
+            normalised_stock = random.Random().choice(MULTIPLIER) * base_value
+            return round(normalised_stock,3)
+
+        asset_list = []
+        company_freq = int(company_ratio*self.rounds)  #  how many number of companies as per total number of rounds
+        stock_freq = self.rounds - company_freq  #  how many number of stocks as per total number of rounds
+        print(f"the number of companies: {company_freq}")
+        print(f"the number of stocks: {stock_freq}")
+
+        for company in range(company_freq):
+            asset_list.append({"type":"company", "earn":generate_normal_company()})
+        for stock in range(stock_freq):
+            asset_list.append({"type":"stock", "earn":generate_normal_stock()})
 
 
-        normalised = np.random.normal(loc=5,  scale=1, size=self.rounds)
 
-        print(normalised)
+        asset_list_random_ = random.Random().choices(asset_list, k=self.rounds)  #  it gives randomised stuff from the asset list
+        return asset_list_random_
+
+
 
 
 
@@ -53,7 +75,6 @@ a.make_account(name="chi")
 a.make_account(name="gota")
 
 a.generate_normalised()
-
 
 
 
