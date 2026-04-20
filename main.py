@@ -19,6 +19,11 @@ class Auctioneer:
 
 
     def make_account(self, name):
+        """
+
+        :param name: name of the player
+        :return: makes an account with "id", "name", "cash":total cash left*, "company":total company owned *
+        """
         if self.player_id <= self.rounds:
             account_info = {
                 "id":self.player_id,
@@ -74,7 +79,7 @@ a.make_account(name="cha")
 a.make_account(name="chi")
 a.make_account(name="gota")
 
-a.generate_normalised()
+# a.generate_normalised()
 
 
 
@@ -83,18 +88,34 @@ class GUI:
         self.accounts = accounts
         self.main_window = tkinter.Tk()
         self.main_window.title("Dominator")
-        self.MAIN_FRAME = tkinter.Frame(self.main_window)
-        self.MAIN_FRAME.pack()
+        self.main_window.state("zoomed")  #  learning:  it starts the windows with full screen
+        self.main_window.columnconfigure(0, weight=1)  #  learning: this tells the inner widgets that your allowed to grow or shrink
+        self.main_window.rowconfigure(0, weight=1)  # same
+        self.container = tkinter.Frame(self.main_window)
+        self.container.pack(fill="both", expand=True, pady=10, padx=10)
         self.generate_frames()
         tkinter.mainloop()
 
+
+
+
+
+
     def generate_frames(self):
+        def container_equaliser():  # basically configs each columns to share same space b/w
+            for cont in range(len(self.accounts)):
+                self.container.columnconfigure(cont, weight=1,
+                                               uniform="col")  # make each container equally spaced through columns
+            self.container.rowconfigure(0, weight=1)  # we could change this in future
+
+
+        container_equaliser()
         for player in self.accounts:
             print(player)
             id_ = self.accounts[player]["id"]
             name = self.accounts[player]["name"]
-            player_frame = tkinter.LabelFrame(text=name, master=self.MAIN_FRAME, width=int(1920/len(self.accounts)))
-            player_frame.grid(row=0, column=id_)
+            player_frame = tkinter.LabelFrame(text=name, master=self.container, width=int(1920 / len(self.accounts)))
+            player_frame.grid(row=0, column=id_, sticky="nsew", padx=5, pady=5)  # sticky=nsew is the key, it tells its hammered to 4 corners of the label, so it streaches to fill it up
             tkinter.Label(master=player_frame, text=name).pack()
 
 
