@@ -15,6 +15,8 @@ class Auctioneer:
         self.init_cash = init_cash  #  total cash at begining
         self.players = players  #  total players
         self.player_id = 0
+        self.highest_bid = 0
+        self.highest_players_who_bid = []
         self.accounts = {}
 
 
@@ -70,6 +72,48 @@ class Auctioneer:
 
 
 
+    def player_bid(self, player_id_list, player_bid, players_split, asset):  #  how much player / players bids
+        #  player bid - how much in net, players can bid
+        # *note player split is only valid when the other person has money to give, or else there will be dynamic split of money based on the money left with players
+        # asset - which asset is on auction
+        net_cash = 0
+
+
+        if player_bid > self.highest_bid:
+            self.highest_bid = player_bid  # need to refresh every round
+            self.highest_players_who_bid = player_id_list  # need to refresh every round
+
+        for player_id in player_id_list:
+            net_cash += a.accounts[player_id]["cash"]  # basically combined how much they can bid max,: note ony for limiting unlimited investment
+
+        try:
+            main_player_cash = a.accounts[player_id_list[0]]["cash"]
+            side_player_cash = a.accounts[player_id_list[1]]["cash"]
+        except IndexError:
+            main_player_cash = a.accounts[player_id_list[0]]["cash"]
+            side_player_cash = 0
+
+
+        if player_bid <= net_cash:
+            print(asset)
+            asset_split = round(asset["earn"]*players_split, 3)
+            asset_split_list = [asset_split, round(asset["earn"]-asset_split, 3)]
+            main_player_money_split = round(player_bid*players_split, 3)
+            side_player_money_split = round(player_bid*(1-players_split), 3)
+            money_left_list = [main_player_cash-main_player_money_split, side_player_cash-side_player_money_split]
+            print(f"how much asset will split: {asset_split_list}")
+            print(f"how much money will be left:{money_left_list}")
+        else:
+            print("players dont have that much money...")
+
+
+
+
+
+
+
+
+
 
 
 a = Auctioneer(rounds=5, init_cash=10, players=5)
@@ -79,7 +123,12 @@ a.make_account(name="cha")
 a.make_account(name="chi")
 a.make_account(name="gota")
 
-# a.generate_normalised()
+
+assets = a.generate_normalised()
+print(a.accounts)
+a.player_bid(player_id_list=[0,] , players_split=1, asset=assets[0], player_bid=9)
+
+exit()
 
 
 
